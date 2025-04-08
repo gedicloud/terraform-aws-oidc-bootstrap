@@ -45,25 +45,23 @@ data "aws_iam_policy_document" "hcp_oidc_assume_role_policy" {
   statement {
     effect = "Allow"
     actions = ["sts:AssumeRoleWithWebIdentity"]
-
     principals {
       type        = "Federated"
       identifiers = [aws_iam_openid_connect_provider.hcp_terraform.arn]
     }
-
     condition {
       test     = "StringEquals"
       variable = "app.terraform.io:aud"
       values   = [local.hcp_audience]
     }
-
     condition {
-      test     = "StringEquals"
+      test     = "StringLike"
       variable = "app.terraform.io:sub"
-      values   = ["organization:${var.tfc_organization_name}:project:${var.tfc_project_name}:workspace:*:run_phase:*"]
+      values   = ["organization:${var.tfc_organization_name}:*"]
     }
   }
 }
+
 # IAM role in the member account that can be assumed by HCP Terraform
 resource "aws_iam_role" "this" {
   provider           = aws.member_account
