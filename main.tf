@@ -65,7 +65,7 @@ data "aws_iam_policy_document" "hcp_oidc_assume_role_policy" {
 # IAM role in the member account that can be assumed by HCP Terraform
 resource "aws_iam_role" "this" {
   provider           = aws.member_account
-  name               = "hcp_terraform_oidc_role"
+  name               = "tfc-oidc-role"
   assume_role_policy = data.aws_iam_policy_document.hcp_oidc_assume_role_policy.json
 }
 
@@ -100,10 +100,11 @@ resource "aws_iam_user_policy_attachment" "admin_policy" {
 }
 
 # Create a TFE variable set for the IAM role in the project
+# Variable set name must be unique in organization
 
 resource "tfe_variable_set" "this" {
-  name         = aws_iam_role.this.name
-  description  = "OIDC federation configuration for ${aws_iam_role.this.name}"
+  name         = "${var.tfc_project_name}-${aws_iam_role.this.name}"
+  description  = "OIDC federation configuration for HCP Terraform"
   organization = var.tfc_organization_name 
 }
 
