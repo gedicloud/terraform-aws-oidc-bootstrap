@@ -69,6 +69,24 @@ resource "aws_iam_role" "this" {
   assume_role_policy = data.aws_iam_policy_document.hcp_oidc_assume_role_policy.json
 }
 
+# Allow the tfc-oidc-role to assume the Route53 delegation role in platform account
+resource "aws_iam_role_policy" "allow_crossaccount_route53" {
+  provider = aws.member_account
+  name     = "AllowRoute53DelegationAccess"
+  role     = aws_iam_role.this.name
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = ["sts:AssumeRole"],
+        Resource = "arn:aws:iam::${var.platform_utility_account_id}:role/Route53DelegationWrite"
+      }
+    ]
+  })
+}
+
 # Attach the AdministratorAccess policy to the IAM role in the member_account
 resource "aws_iam_role_policy_attachment" "admin_access" {
   provider  = aws.member_account

@@ -1,9 +1,6 @@
 # Copyright (c) GEDI, Inc.
 # SPDX-License-Identifier: MPL-2.0
 
-# Copyright (c) GEDI, Inc.
-# SPDX-License-Identifier: MPL-2.0
-
 variable "region" {
   description = "The AWS region where resources will be created."
   type        = string
@@ -20,8 +17,13 @@ variable "tfc_project_name" {
   type        = string
 }
 
+variable "platform_utility_account_id" {
+  description = "The account ID of the platform/root AWS account (e.g. where Route53 parent zone lives)"
+  type        = string
+}
+
 variable "token" {
-  description = "HCP Terraform admin user token for API authentication."
+  description = "HCP Terraform organization token for API authentication."
   type        = string
   sensitive   = true
 }
